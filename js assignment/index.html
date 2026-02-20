@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+    <link rel="stylesheet" href="/style.css">
+<head>
+  <meta charset="UTF-8" />
+  <title>Smart Event Dashboard</title>
+</head>
+<body>
+
+  <h1>🎯 Smart Event Dashboard</h1>
+
+  <div class="main-grid">
+
+    <!-- LEFT: Form -->
+    <div class="card">
+      <h2>Add New Event</h2>
+
+      <label>Event Title:</label>
+      <input type="text" id="title" />
+
+      <label>Event Date:</label>
+      <input type="date" id="date" />
+
+      <label>Category:</label>
+      <select id="category">
+        <option>Conference</option>
+        <option>Workshop</option>
+        <option>Webinar</option>
+        <option>Meetup</option>
+        <option>Hackathon</option>
+        <option>Other</option>
+      </select>
+
+      <label>Description:</label>
+      <textarea id="desc"></textarea>
+
+      <button id="btn-add">Add Event</button>
+    </div>
+
+    <!-- RIGHT: Events List -->
+    <div class="card">
+      <h2>My Events</h2>
+
+      <div class="top-btns">
+        <button id="btn-clear">Clear All Events</button>
+        <button id="btn-sample">Add Sample Events</button>
+      </div>
+
+      <div id="events-box">
+        <p id="no-msg">No events yet. Add your first event!</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- DOM Demo -->
+  <div class="card dom-card">
+    <h2>DOM Manipulation Demo</h2>
+    <div class="demo-box">
+      <p><strong>innerText vs innerHTML vs textContent</strong></p>
+      <p><strong>Original HTML:</strong> &lt;strong&gt;Bold Text&lt;/strong&gt; with spaces</p>
+      <p><strong>innerHTML:</strong> Renders HTML tags → <strong>Bold Text</strong> with spaces</p>
+      <p><strong>innerText:</strong> Removes HTML, collapses spaces → Bold Text with spaces</p>
+      <p><strong>textContent:</strong> Removes HTML, keeps spaces → Bold Text with spaces</p>
+      <p id="key-display">You Pressed: <span id="key-value"></span></p>
+    </div>
+  </div>
+
+  <script>
+
+    // Get all elements we need
+    const titleInput    = document.getElementById('title');
+    const dateInput     = document.getElementById('date');
+    const categoryInput = document.getElementById('category');
+    const descInput     = document.getElementById('desc');
+    const eventsBox     = document.getElementById('events-box');
+    const noMsg         = document.getElementById('no-msg');
+    const keyValue      = document.getElementById('key-value');
+
+    // Array to store all events
+    let events = [];
+
+
+    // ADD EVENT
+    document.getElementById('btn-add').addEventListener('click', () => {
+
+      const title = titleInput.value.trim();
+      const date  = dateInput.value;
+      const cat   = categoryInput.value;
+      const desc  = descInput.value.trim();
+
+      if (title === '') {
+        alert('Please enter an event title.');
+        return;
+      }
+
+      events.push({ title, date, category: cat, description: desc });
+
+      // Clear form
+      titleInput.value = '';
+      dateInput.value  = '';
+      descInput.value  = '';
+      categoryInput.selectedIndex = 0;
+
+      showEvents();
+    });
+
+
+    // CLEAR ALL
+    document.getElementById('btn-clear').addEventListener('click', () => {
+      events = [];
+      showEvents();
+    });
+
+
+    // SAMPLE EVENTS
+    document.getElementById('btn-sample').addEventListener('click', () => {
+      events = [
+        { title: 'EmiFest',      date: '2026-03-24', category: 'Conference', description: 'lorem ipsum' },
+        { title: 'Tech Webinar', date: '2026-04-10', category: 'Webinar',    description: 'Join us for cutting-edge talks.' },
+        { title: 'JS Hackathon', date: '2026-05-01', category: 'Hackathon',  description: 'Build something in 24 hrs.' }
+      ];
+      showEvents();
+    });
+
+
+    // DRAW CARDS ON SCREEN
+    function showEvents() {
+
+      // Remove old cards
+      eventsBox.querySelectorAll('.event-card').forEach(card => card.remove());
+
+      // Show empty message if no events
+      if (events.length === 0) {
+        noMsg.style.display = 'block';
+        return;
+      }
+
+      noMsg.style.display = 'none';
+
+      // Create a card for each event
+      events.forEach((ev, i) => {
+        const card = document.createElement('div');
+        card.className = 'event-card';
+
+        card.innerHTML =
+          '<button class="btn-delete" data-index="' + i + '">✕</button>' +
+          '<div class="card-title">' + ev.title + '</div>' +
+          '<div class="card-date">📅 ' + (ev.date || 'No date') + '</div>' +
+          '<span class="card-cat">' + ev.category + '</span>' +
+          '<div class="card-desc">' + ev.description + '</div>';
+
+        eventsBox.appendChild(card);
+      });
+    }
+
+
+    // EVENT DELEGATION — one listener handles delete
+    eventsBox.addEventListener('click', (e) => {
+
+      // Delete button clicked
+      if (e.target.className === 'btn-delete') {
+        const index = e.target.getAttribute('data-index');
+        events.splice(index, 1);
+        showEvents();
+        return;
+      }
+
+
+    });
+
+
+    // KEYBOARD EVENT
+    document.addEventListener('keydown', (e) => {
+      keyValue.textContent = e.key;
+    });
+
+  </script>
+</body>
+</html>
